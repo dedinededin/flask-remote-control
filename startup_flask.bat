@@ -1,0 +1,1 @@
+C:/Users/Abraham/PycharmProjects/flask-remote-control/venv/Scripts/python.exe C:/Users/Abraham/PycharmProjects/flask-remote-control/app.py >> log.txt 2>&1

@@ -5,14 +5,16 @@ import subprocess
 app = Flask('flaskshell')
 ip_whitelist = ['192.168.1.124']
 command_list = {
-    "lock": "pmset displaysleepnow",
-    "restart": "reboot",
-    "shutdown": "shutdown -r now",
+    "lock": "rundll32.exe user32.dll,LockWorkStation",
+    "restart": "shutdown /r",
+    "shutdown": "shutdown /s",
 }
 
 
 def valid_ip():
     client = request.remote_addr
+    if '*' in ip_whitelist:
+        return True
     if client in ip_whitelist:
         return True
     else:
@@ -32,12 +34,13 @@ def show_commands():
 @app.route('/<command_option>')
 def get_status(command_option):
     if valid_ip():
-        command = command_list[command_option]
         try:
-            result_success = subprocess.check_output(
-                [command], shell=True)
+            command = command_list[command_option]
+            result_success = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
-            return "An error occurred while trying to fetch task status updates."
+            return "An error occurred while trying run the command."
+        except KeyError:
+            return "Command not found"
 
         return f'Response\n{result_success}', 200
     else:
@@ -45,4 +48,4 @@ def get_status(command_option):
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.1.111')
+    app.run(host='192.168.1.123')
